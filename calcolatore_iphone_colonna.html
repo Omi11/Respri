@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolatore Profitti iPhone - Ricondizionamento</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px 20px;
+        }
+
+        /* MENU SCREEN */
+        #menuScreen {
+            display: block;
+        }
+
+        #calculatorScreen {
+            display: none;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .menu-button {
+            padding: 20px;
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .menu-button:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .menu-button:active {
+            transform: translateY(0);
+        }
+
+        .back-button {
+            background: #e74c3c;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .back-button:hover {
+            background: #c0392b;
+        }
+
+        /* CALCULATOR FORM STYLE */
+        .calculator-form {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .phone-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .profile-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .profile-row input, .profile-row select {
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 0.9em;
+        }
+
+        .profile-row button {
+            padding: 8px 10px;
+            font-size: 0.85em;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        .form-group input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+        }
+
+        .result-item {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-label {
+            font-size: 0.85em;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .result-value {
+            font-size: 1.6em;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .result-item.profit-positive {
+            border-left-color: #27ae60;
+            background: #f0fdf4;
+        }
+
+        .result-item.profit-positive .result-value {
+            color: #27ae60;
+        }
+
+        .result-item.profit-negative {
+            border-left-color: #e74c3c;
+            background: #fef2f2;
+        }
+
+        .result-item.profit-negative .result-value {
+            color: #e74c3c;
+        }
+
+        .result-item.profit-neutral {
+            border-left-color: #f39c12;
+            background: #fffef0;
+        }
+
+        .result-item.profit-neutral .result-value {
+            color: #f39c12;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95em;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+        
+        .btn-info {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .note {
+            background: #fffacd;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #333;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.85em;
+            border-top: 2px solid #ddd;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .header p {
+                font-size: 0.95em;
+            }
+            
+            .content {
+                padding: 15px 10px;
+            }
+
+            .menu-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .menu-button {
+                padding: 15px 10px;
+                font-size: 0.85em;
+            }
+
+            .calculator-form {
+                padding: 15px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .result-item {
+                padding: 12px;
+            }
+
+            .result-value {
+                font-size: 1.3em;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+                padding: 10px 16px;
+                font-size: 0.9em;
+            }
+            
+            .note {
+                padding: 10px;
+                font-size: 0.85em;
+            }
+            
+            .footer {
+                padding: 15px 10px;
+                font-size: 0.75em;
+            }
+
+            .profile-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 Calcolatore Profitti iPhone</h1>
+            <p>Calcola e salva le valutazioni per ogni telefono</p>
+        </div>
+        
+        <div class="content">
+            <!-- MENU SCREEN -->
+            <div id="menuScreen">
+                <h2 style="margin-bottom: 20px; color: #333;">Scegli il modello iPhone:</h2>
+                <div class="menu-grid">
+                    <button class="menu-button" onclick="selectPhone('iPhone 12')">iPhone 12</button>
+                    <button class="menu-button" onclick="selectPhone('iPhone 12 Pro')">iPhone 12 Pro</button>
+                    <button class="menu-button" onclick="selectPhone('iPhone 12 Pro Max')">iPhone 12 Pro Max</button>
+                    <button class="menu-button" onclick="selectPhone('iPhone 13')">iPhone 13</button>
+                    <button class="menu-button" onclick="selectPhone('iPhone 13 Pro')">iPhone 13 Pro</button>
+                    <button class="menu-button" onclick="selectPhone('iPhone 13 Pro Max')">iPhone 13 Pro Max</button>
+                    <button class="menu-button" onclick="selectPhone('iPhone 14')">iPhone 14</button>
+                    <button class="menu-button" onclick="selectPhone('iPhone 14 Pro')">iPhone 14 Pro</button>
+                    <button class="menu-button" onclick="selectPhone('iPhone 14 Pro Max')">iPhone 14 Pro Max</button>
+                    <button class="menu-button" onclick="selectPhone('iPhone 15')">iPhone 15</button>
+                    <button class="menu-button" onclick="selectPhone('iPhone 15 Pro')">iPhone 15 Pro</button>
+                    <button class="menu-button" onclick="selectPhone('iPhone 15 Pro Max')">iPhone 15 Pro Max</button>
+                    <button class="menu-button" onclick="selectPhone('iPhone 16')">iPhone 16</button>
+                    <button class="menu-button" onclick="selectPhone('iPhone 16 Pro')">iPhone 16 Pro</button>
+                    <button class="menu-button" onclick="selectPhone('iPhone 16 Pro Max')">iPhone 16 Pro Max</button>
+                </div>
+            </div>
+
+            <!-- CALCULATOR SCREEN -->
+            <div id="calculatorScreen">
+                <button class="back-button" onclick="backToMenu()">← Torna al Menu</button>
+                
+                <div class="buttons">
+                    <button class="btn-primary" onclick="calcolaAll()">Calcola</button>
+                    <button class="btn-secondary" onclick="pulisciAll()">Pulisci campi</button>
+                    <button class="btn-info" onclick="esportaCSV()">Esporta CSV</button>
+                </div>
+
+                <div class="calculator-form">
+                    <div class="phone-title" id="phoneTitle">iPhone</div>
+
+                    <div class="profile-row">
+                        <input type="text" id="profileName" placeholder="Nome scheda es. Telefono 1">
+                        <select id="profileSelect"></select>
+                        <div style="display:flex; gap:6px;">
+                            <button class="btn-primary" style="padding:8px 10px;" onclick="saveCurrentProfile()">Salva scheda</button>
+                            <button class="btn-info" style="padding:8px 10px;" onclick="loadSelectedProfile()">Carica scheda</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="prezzoAcquisto">Prezzo acquisto rotto (€)</label>
+                            <input type="number" id="prezzoAcquisto" value="0" step="1" onchange="aggiornaCalcolo()">
+                        </div>
+                        <div class="form-group">
+                            <label for="costoSchermo">Costo schermo (€)</label>
+                            <input type="number" id="costoSchermo" value="0" step="1" onchange="aggiornaCalcolo()">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="costoBatteria">Costo batteria (€)</label>
+                            <input type="number" id="costoBatteria" value="0" step="1" onchange="aggiornaCalcolo()">
+                        </div>
+                        <div class="form-group">
+                            <label for="costoTelaio">Costo telaio/back (€)</label>
+                            <input type="number" id="costoTelaio" value="0" step="1" onchange="aggiornaCalcolo()">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="altriCosti">Altri costi (€)</label>
+                            <input type="number" id="altriCosti" value="0" step="1" onchange="aggiornaCalcolo()">
+                        </div>
+                        <div class="form-group">
+                            <label for="prezzoVenditaInput">Prezzo vendita (modificabile)</label>
+                            <input type="number" id="prezzoVenditaInput" value="0" step="1" onchange="aggiornaCalcolo()">
+                            <div style="margin-top:4px;font-size:0.8em;color:#666;">
+                                Prezzo medio: <span id="prezzoMedioLabel">€0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="results-grid">
+                        <div class="result-item">
+                            <div class="result-label">Costo totale</div>
+                            <div class="result-value" id="costoTotaleResult">€0</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Prezzo vendita usato</div>
+                            <div class="result-value" id="prezzoVenditaResult">€0</div>
+                        </div>
+                        <div class="result-item" id="profittoResult">
+                            <div class="result-label">Profitto netto</div>
+                            <div class="result-value" id="profittoValue">€0</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Margine %</div>
+                            <div class="result-value" id="margineResult">0%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="note">
+                    ℹ️ <strong>Suggerimento:</strong> Dai un nome alla scheda (es. Telefono 1, Telefono 2) e premi “Salva scheda”. 
+                    In seguito potrai richiamarla dal menu a tendina e rivedere tutti i dati.
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2026 Calcolatore Profitti iPhone - Business Tool per Ricondizionamento</p>
+        </div>
+    </div>
+    
+    <script>
+        const defaultPrices = {
+            'iPhone 12': 225,
+            'iPhone 12 Pro': 265,
+            'iPhone 12 Pro Max': 270,
+            'iPhone 13': 300,
+            'iPhone 13 Pro': 350,
+            'iPhone 13 Pro Max': 520,
+            'iPhone 14': 320,
+            'iPhone 14 Pro': 450,
+            'iPhone 14 Pro Max': 590,
+            'iPhone 15': 550,
+            'iPhone 15 Pro': 700,
+            'iPhone 15 Pro Max': 800,
+            'iPhone 16': 570,
+            'iPhone 16 Pro': 850,
+            'iPhone 16 Pro Max': 1000
+        };
+
+        const STORAGE_KEY = 'iphone_profit_tool_v1';
+        let currentPhone = '';
+
+        function loadAllProfiles() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return {};
+            try {
+                return JSON.parse(raw);
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function saveAllProfiles(profiles) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(profiles));
+        }
+
+        function refreshProfileSelect() {
+            const select = document.getElementById('profileSelect');
+            select.innerHTML = '';
+            if (!currentPhone) return;
+
+            const profiles = loadAllProfiles();
+            const forPhone = profiles[currentPhone] || {};
+            const names = Object.keys(forPhone);
+
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.textContent = 'Schede salvate...';
+            select.appendChild(placeholder);
+
+            names.forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                select.appendChild(opt);
+            });
+        }
+
+        function selectPhone(phone) {
+            currentPhone = phone;
+            document.getElementById('menuScreen').style.display = 'none';
+            document.getElementById('calculatorScreen').style.display = 'block';
+            document.getElementById('phoneTitle').textContent = phone;
+
+            const prezzoMedio = defaultPrices[phone];
+            document.getElementById('prezzoVenditaInput').value = prezzoMedio;
+            document.getElementById('prezzoMedioLabel').textContent = '€' + prezzoMedio.toFixed(2);
+            document.getElementById('prezzoVenditaResult').textContent = '€' + prezzoMedio.toFixed(2);
+
+            document.getElementById('profileName').value = '';
+            pulisciAll(false);
+            refreshProfileSelect();
+            window.scrollTo(0, 0);
+        }
+
+        function backToMenu() {
+            document.getElementById('calculatorScreen').style.display = 'none';
+            document.getElementById('menuScreen').style.display = 'block';
+            currentPhone = '';
+            window.scrollTo(0, 0);
+        }
+
+        function aggiornaCalcolo() {
+            if (!currentPhone) return;
+
+            const prezzoAcquisto = parseFloat(document.getElementById('prezzoAcquisto').value) || 0;
+            const costoSchermo = parseFloat(document.getElementById('costoSchermo').value) || 0;
+            const costoBatteria = parseFloat(document.getElementById('costoBatteria').value) || 0;
+            const costoTelaio = parseFloat(document.getElementById('costoTelaio').value) || 0;
+            const altriCosti = parseFloat(document.getElementById('altriCosti').value) || 0;
+
+            const prezzoMedio = defaultPrices[currentPhone];
+            const prezzoVenditaInput = parseFloat(document.getElementById('prezzoVenditaInput').value) || prezzoMedio;
+            const prezzoVendita = prezzoVenditaInput;
+
+            const costoTotale = prezzoAcquisto + costoSchermo + costoBatteria + costoTelaio + altriCosti;
+            const profittoNetto = prezzoVendita - costoTotale;
+            const percentualeMargine = prezzoVendita > 0 ? ((profittoNetto / prezzoVendita) * 100).toFixed(1) : 0;
+
+            document.getElementById('costoTotaleResult').textContent = '€' + costoTotale.toFixed(2);
+            document.getElementById('profittoValue').textContent = '€' + profittoNetto.toFixed(2);
+            document.getElementById('margineResult').textContent = percentualeMargine + '%';
+            document.getElementById('prezzoVenditaResult').textContent = '€' + prezzoVendita.toFixed(2);
+
+            const profittoResult = document.getElementById('profittoResult');
+            profittoResult.classList.remove('profit-positive', 'profit-negative', 'profit-neutral');
+
+            if (profittoNetto > 100) {
+                profittoResult.classList.add('profit-positive');
+            } else if (profittoNetto < -50) {
+                profittoResult.classList.add('profit-negative');
+            } else {
+                profittoResult.classList.add('profit-neutral');
+            }
+
+            // Salva automaticamente se c'è un nome scheda
+            const name = document.getElementById('profileName').value.trim();
+            if (name) {
+                saveCurrentProfile(false); // silent
+                refreshProfileSelect();
+            }
+        }
+
+        function calcolaAll() {
+            aggiornaCalcolo();
+        }
+
+        // resetPrezzoVendita = true per resettare anche il prezzo vendita, false per lasciarlo
+        function pulisciAll(resetPrezzoVendita = true) {
+            document.getElementById('prezzoAcquisto').value = 0;
+            document.getElementById('costoSchermo').value = 0;
+            document.getElementById('costoBatteria').value = 0;
+            document.getElementById('costoTelaio').value = 0;
+            document.getElementById('altriCosti').value = 0;
+
+            if (resetPrezzoVendita && currentPhone) {
+                const prezzoMedio = defaultPrices[currentPhone];
+                document.getElementById('prezzoVenditaInput').value = prezzoMedio;
+                document.getElementById('prezzoMedioLabel').textContent = '€' + prezzoMedio.toFixed(2);
+                document.getElementById('prezzoVenditaResult').textContent = '€' + prezzoMedio.toFixed(2);
+            }
+
+            aggiornaCalcolo();
+        }
+
+        function saveCurrentProfile(showAlert = true) {
+            if (!currentPhone) return;
+            const name = document.getElementById('profileName').value.trim();
+            if (!name) {
+                if (showAlert) alert('Inserisci un nome per la scheda (es. Telefono 1).');
+                return;
+            }
+
+            const profiles = loadAllProfiles();
+            if (!profiles[currentPhone]) profiles[currentPhone] = {};
+
+            profiles[currentPhone][name] = {
+                prezzoAcquisto: document.getElementById('prezzoAcquisto').value,
+                costoSchermo: document.getElementById('costoSchermo').value,
+                costoBatteria: document.getElementById('costoBatteria').value,
+                costoTelaio: document.getElementById('costoTelaio').value,
+                altriCosti: document.getElementById('altriCosti').value,
+                prezzoVendita: document.getElementById('prezzoVenditaInput').value
+            };
+
+            saveAllProfiles(profiles);
+            refreshProfileSelect();
+            if (showAlert) alert('Scheda salvata per ' + currentPhone + ' (' + name + ').');
+        }
+
+        function loadProfile(phone, name) {
+            const profiles = loadAllProfiles();
+            const phoneProfiles = profiles[phone] || {};
+            const p = phoneProfiles[name];
+            if (!p) return;
+
+            document.getElementById('profileName').value = name;
+            document.getElementById('prezzoAcquisto').value = p.prezzoAcquisto || 0;
+            document.getElementById('costoSchermo').value = p.costoSchermo || 0;
+            document.getElementById('costoBatteria').value = p.costoBatteria || 0;
+            document.getElementById('costoTelaio').value = p.costoTelaio || 0;
+            document.getElementById('altriCosti').value = p.altriCosti || 0;
+
+            const prezzoMedio = defaultPrices[phone];
+            const prezzoVendita = p.prezzoVendita || prezzoMedio;
+            document.getElementById('prezzoVenditaInput').value = prezzoVendita;
+            document.getElementById('prezzoMedioLabel').textContent = '€' + prezzoMedio.toFixed(2);
+
+            aggiornaCalcolo();
+        }
+
+        function loadSelectedProfile() {
+            if (!currentPhone) return;
+            const select = document.getElementById('profileSelect');
+            const name = select.value;
+            if (!name) {
+                alert('Seleziona una scheda salvata dal menu a tendina.');
+                return;
+            }
+            loadProfile(currentPhone, name);
+        }
+
+        function esportaCSV() {
+            if (!currentPhone) return;
+
+            const profName = document.getElementById('profileName').value.trim() || 'telefono';
+            const prezzoAcquisto = document.getElementById('prezzoAcquisto').value;
+            const costoSchermo = document.getElementById('costoSchermo').value;
+            const costoBatteria = document.getElementById('costoBatteria').value;
+            const costoTelaio = document.getElementById('costoTelaio').value;
+            const altriCosti = document.getElementById('altriCosti').value;
+            const costoTotale = document.getElementById('costoTotaleResult').textContent.replace('€', '').replace(',', '.');
+            const prezzoVendita = document.getElementById('prezzoVenditaResult').textContent.replace('€', '').replace(',', '.');
+            const profittoNetto = document.getElementById('profittoValue').textContent.replace('€', '').replace(',', '.');
+            const margine = document.getElementById('margineResult').textContent;
+
+            let csv = 'Modello,Scheda,Prezzo Acquisto,Costo Schermo,Costo Batteria,Costo Telaio,Altri Costi,Costo Totale,Prezzo Vendita,Profitto Netto,Margine\n';
+            csv += `${currentPhone},${profName},${prezzoAcquisto},${costoSchermo},${costoBatteria},${costoTelaio},${altriCosti},${costoTotale},${prezzoVendita},${profittoNetto},${margine}\n`;
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'profitti_' + currentPhone.replace(/ /g, '_') + '_' + profName.replace(/ /g, '_') + '_' + new Date().toISOString().split('T')[0] + '.csv';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
