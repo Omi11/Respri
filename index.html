@@ -120,7 +120,7 @@
 
         .profile-row {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
+            grid-template-columns: 2fr 1.2fr 1.8fr;
             gap: 10px;
             margin-bottom: 20px;
             align-items: center;
@@ -419,9 +419,10 @@
                     <div class="profile-row">
                         <input type="text" id="profileName" placeholder="Nome scheda es. Telefono 1">
                         <select id="profileSelect"></select>
-                        <div style="display:flex; gap:6px;">
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
                             <button class="btn-primary" style="padding:8px 10px;" onclick="saveCurrentProfile()">Salva scheda</button>
                             <button class="btn-info" style="padding:8px 10px;" onclick="loadSelectedProfile()">Carica scheda</button>
+                            <button class="btn-secondary" style="padding:8px 10px;" onclick="deleteCurrentProfile()">Elimina scheda</button>
                         </div>
                     </div>
                     
@@ -483,7 +484,7 @@
                 
                 <div class="note">
                     ℹ️ <strong>Suggerimento:</strong> Dai un nome alla scheda (es. Telefono 1, Telefono 2) e premi “Salva scheda”. 
-                    In seguito potrai richiamarla dal menu a tendina e rivedere tutti i dati.
+                    Puoi ricaricarla dal menu a tendina o eliminarla con il tasto rosso.
                 </div>
             </div>
         </div>
@@ -608,10 +609,9 @@
                 profittoResult.classList.add('profit-neutral');
             }
 
-            // Salva automaticamente se c'è un nome scheda
             const name = document.getElementById('profileName').value.trim();
             if (name) {
-                saveCurrentProfile(false); // silent
+                saveCurrentProfile(false);
                 refreshProfileSelect();
             }
         }
@@ -620,7 +620,6 @@
             aggiornaCalcolo();
         }
 
-        // resetPrezzoVendita = true per resettare anche il prezzo vendita, false per lasciarlo
         function pulisciAll(resetPrezzoVendita = true) {
             document.getElementById('prezzoAcquisto').value = 0;
             document.getElementById('costoSchermo').value = 0;
@@ -693,6 +692,37 @@
                 return;
             }
             loadProfile(currentPhone, name);
+        }
+
+        function deleteCurrentProfile() {
+            if (!currentPhone) return;
+
+            const name = document.getElementById('profileName').value.trim();
+            if (!name) {
+                alert('Seleziona o scrivi il nome della scheda da eliminare.');
+                return;
+            }
+
+            const profiles = loadAllProfiles();
+            if (!profiles[currentPhone] || !profiles[currentPhone][name]) {
+                alert('Nessuna scheda salvata con questo nome per questo modello.');
+                return;
+            }
+
+            if (!confirm('Vuoi davvero eliminare la scheda "' + name + '" per ' + currentPhone + '?')) {
+                return;
+            }
+
+            delete profiles[currentPhone][name];
+
+            if (Object.keys(profiles[currentPhone]).length === 0) {
+                delete profiles[currentPhone];
+            }
+
+            saveAllProfiles(profiles);
+            refreshProfileSelect();
+            document.getElementById('profileName').value = '';
+            alert('Scheda eliminata.');
         }
 
         function esportaCSV() {
